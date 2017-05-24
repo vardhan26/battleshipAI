@@ -11,8 +11,8 @@ shipnames = {'carrier':5,
 ships = [5,4,3,3,2]
 unguessed = 0
 miss = 1
-hit = -1
-sink = -2
+hit = 7
+sink = 9
 SIZE = 10
 board = []
 static_board = []
@@ -47,17 +47,69 @@ def placeship(shipsize):		#function to place ships on the board randomly
 					board[x+i][y] = shipsize
 			break
 
+def checksink(x1,y1,x2,y2):				#checksink needs to be updated. fails if destroyer(3) and cruiser(3) ships are adjacent.
+	sizeofship = static_board[x2][y2]
+	if y2>y1:
+		c = 0
+		for i in range(sizeofship):
+			if y2-i>=0 and static_board[x2][y2-i]==sizeofship and board[x2][y2-i]==hit:
+				c+=1
+		if c==sizeofship:
+			for i in range(sizeofship):
+				board[x2][y2-i]=sink
+			ships.remove(sizeofship)
+			return 1
+		else:
+			return 0
+	elif y1>y2:
+		c = 0
+		for i in range(sizeofship):
+			if y2+i<SIZE and static_board[x2][y2+i]==sizeofship and board[x2][y2+i]==hit:
+				c+=1
+		if c==sizeofship:
+			for i in range(sizeofship):
+				board[x2][y2+i]=sink
+			ships.remove(sizeofship)
+			return 1
+		else:
+			return 0
+	elif x2>x1:
+		c = 0
+		for i in range(sizeofship):
+			if x2-i>=0 and static_board[x2-i][y2]==sizeofship and board[x2-i][y2]==hit:
+				c+=1
+		if c==sizeofship:
+			for i in range(sizeofship):
+				board[x2-i][y2]=sink
+			ships.remove(sizeofship)
+			return 1
+		else:
+			return 0
+	elif x1>x2:
+		c = 0
+		for i in range(sizeofship):
+			if x2+i<SIZE and static_board[x2+i][y2]==sizeofship and board[x2+i][y2]==hit:
+				c+=1
+		if c==sizeofship:
+			for i in range(sizeofship):
+				board[x2+i][y2]=sink
+			ships.remove(sizeofship)
+			return 1
+		else:
+			return 0
+
+
 
 def shootdirection(way,x,y,blocks):
-	if way == 0:
+	if way == 'right':
 		if board[x][y+1]==unguessed:
 			board[x][y+1] = miss
 			return 0
 		else:
 			board[x][y+1] = hit
 			if not checksink(x,y,x,y+1):		#TODO make a function checksink to check sinking status of any ship after the last hit
-				for i in range(2,blocks):
-					if board[x][y+i] in ships:
+				for i in range(2,blocks+1):
+					if static_board[x][y+i] in ships:
 						board[x][y+i]=hit
 						if checksink(x,y,x,y+i):
 							break
@@ -68,15 +120,15 @@ def shootdirection(way,x,y,blocks):
 				return 2
 			if board[x][y] == hit:
 				return 1
-	if way == 1:
+	elif way == 'left':
 		if board[x][y-1]==unguessed:
 			board[x][y-1] = miss
 			return 0
 		else:
 			board[x][y-1] = hit
 			if not checksink(x,y,x,y-1):		
-				for i in range(2,blocks):
-					if board[x][y-i] in ships:
+				for i in range(2,blocks+1):
+					if static_board[x][y-i] in ships:
 						board[x][y-i]=hit
 						if checksink(x,y,x,y-i):
 							break
@@ -87,17 +139,17 @@ def shootdirection(way,x,y,blocks):
 				return 2
 			if board[x][y] == hit:
 				return 1
-	if way == 2:
+	elif way == 'down':
 		if board[x+1][y]==unguessed:
 			board[x+1][y] = miss
 			return 0
 		else:
 			board[x+1][y] = hit
 			if not checksink(x,y,x+1,y):		
-				for i in range(2,blocks):
-					if board[x+1][y] in ships:
-						board[x+1][y]=hit
-						if checksink(x,y,x+1,y):
+				for i in range(2,blocks+1):
+					if static_board[x+i][y] in ships:
+						board[x+i][y]=hit
+						if checksink(x,y,x+i,y):
 							break
 					else:
 						board[x+i][y] = miss
@@ -106,17 +158,17 @@ def shootdirection(way,x,y,blocks):
 				return 2
 			if board[x][y] == hit:
 				return 1
-	if way == 3:
+	elif way == 'up':
 		if board[x-1][y]==unguessed:
 			board[x-1][y] = miss
 			return 0
 		else:
 			board[x-1][y] = hit
 			if not checksink(x,y,x-1,y):		
-				for i in range(2,blocks):
-					if board[x-1][y] in ships:
-						board[x-1][y]=hit
-						if checksink(x,y,x-1,y):
+				for i in range(2,blocks+1):
+					if static_board[x-i][y] in ships:
+						board[x-i][y]=hit
+						if checksink(x,y,x-i,y):
 							break
 					else:
 						board[x-i][y] = miss
@@ -125,57 +177,64 @@ def shootdirection(way,x,y,blocks):
 				return 2
 			if board[x][y] == hit:
 				return 1
-
-
-
-
+	else:
+		return 0
 
 def target_mode(x, y):
-	direction = [0,0,0,0] 		#directions from x,y
+	direction = {'right':0,'left':0,'down':0,'up':0}		#directions from x,y
 	k=1
 	while y+k<SIZE and board[x][y+k] in shootable:
 		k+=1
-	direction[0]=k-1
+	direction['right']=k-1
 	k=1
 	while y-k>=0 and board[x][y-k] in shootable:
 		k+=1
-	direction[1]=k-1
+	direction['left']=k-1
 	k=1
 	while x+k<SIZE and board[x+k][y] in shootable:
 		k+=1
-	direction[2]=k-1
+	direction['down']=k-1
 	k=1
 	while x-k>=0 and board[x-k][y] in shootable:
 		k+=1
-	direction[3]=k-1
+	direction['up']=k-1
 	while board[x][y]!=sink:
-		DIR = direction.index(max(direction))
+		pprint(board)
+		print direction
+		print "%d 	%d" %(x,y)
+		DIR = max(direction, key=direction.get)
+		print DIR
 		result = shootdirection(DIR,x,y,direction[DIR])	#shoots in the direction DIR and returns the result
 		if result == 0:		#result is a miss
 			del direction[DIR]
 		elif result == 1: 	#result is hits without sinking x,y and now we shoot in opposite direction of DIR
-			if DIR%2==0:
-				shootdirection(DIR+1,x,y,direction[DIR+1])
-				del direction[DIR]
-				del direction[DIR]
-			else:
-				shootdirection(DIR-1,x,y,direction[DIR-1])
-				del direction[DIR]
-				del direction[DIR-1]
-	if board[x+1][y]==hit:		#if any hit is found after sinking ship with x,y as a coordinate then we target that
-		target_mode(x+1,y)
-	elif board[x-1][y]==hit:
-		target_mode(x-1,y)
-	elif board[x][y+1]==hit:
-		target_mode(x,y+1)
-	elif board[x][y-1]==hit:
-		target_mode(x,y-1)
-
-
-
+			if DIR == 'up':
+				shootdirection('down',x,y,direction['down'])
+				del direction['up']
+				del direction['down']
+			elif DIR == 'down':
+				shootdirection('up',x,y,direction['up'])
+				del direction['up']
+				del direction['down']
+			elif DIR == 'right':
+				shootdirection('left',x,y,direction['left'])
+				del direction['left']
+				del direction['right']
+			elif DIR == 'left':
+				shootdirection('right',x,y,direction['right'])
+				del direction['left']
+				del direction['right']
+	print "hhahahahah"
+	flag = 0
+	for i in range(SIZE):
+		for j in range(SIZE):
+			if board[i][j]==hit:
+				target_mode(i,j)
+				flag = 1
+				break
+		if flag:
+			break
 	
-
-
 #generate a board
 for i in range(SIZE):
 	board.append([unguessed]*SIZE)
@@ -183,24 +242,22 @@ for j in ships:
 	placeship(j)
 pprint(board)
 static_board = deepcopy(board)
-
-c = 0
-life =17
+counter=0
 while True:
 	x = randint(0,9)
 	y = randint(0,9)
-	if board[x][y] not in shootable: or (x+y)%ships[-1]!=0:		#use of parity concept and random shooting till a hit is found
+	if board[x][y] not in shootable or (x+y)%ships[-1]!=0:		#use of parity concept and random shooting till a hit is found
 		continue
-	c+=1
 	if board[x][y] in ships:
 		board[x][y]=hit
-		life-=1
 		target_mode(x,y)
 	else:
 		board[x][y]=miss
-	if len(ships)==0 or life==0:
+	if len(ships)==0:
 		pprint(board)
-		print c
+		for i in range(SIZE):
+			for j in range(SIZE):
+				if board[i][j]==1:
+					counter+=1
+		print counter+17
 		break
-	
-
