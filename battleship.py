@@ -224,7 +224,6 @@ def target_mode(x, y):
 				shootdirection('right',x,y,direction['right'])
 				del direction['left']
 				del direction['right']
-	print "hhahahahah"
 	flag = 0
 	for i in range(SIZE):
 		for j in range(SIZE):
