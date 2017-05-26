@@ -184,27 +184,19 @@ def target_mode(x, y):
 		elif result == 1: 	#result is hits without sinking x,y and now we shoot in opposite direction of DIR
 			del direction[DIR]
 			if direction.get('down',0) and DIR == 'up':
-				print "up here"
 				shootdirection('down',x,y,direction['down'])
-				print "here"
 				#del direction['up']
 				del direction['down']
 			elif direction.get('up',0) and DIR == 'down':
-				print "up here"
 				shootdirection('up',x,y,direction['up'])
-				print "here"
 				del direction['up']
 				#del direction['down']
 			elif direction.get('left',0) and DIR == 'right':
-				print "up here"
 				shootdirection('left',x,y,direction['left'])
-				print "here"
 				del direction['left']
 				#del direction['right']
 			elif direction.get('right',0) and DIR == 'left':
-				print "up here"
 				shootdirection('right',x,y,direction['right'])
-				print "here"
 				#del direction['left']
 				del direction['right']
 	flag = 0
