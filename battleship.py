@@ -8,6 +8,7 @@ shipnames = {'aircraft carrier':[],
 		'destroyer':[],
 		'cruiser':[],
 		'patrol boat':[]}
+
 ships = [5,4,3,3,2]
 unguessed = 0
 miss = 1
@@ -73,7 +74,8 @@ def checksink(x1,y1,x2,y2):
 
 
 def shootdirection(way,x,y,blocks):
-	if way == 'right':
+	print "%d 	%d" %(x,y)
+	if y+1<SIZE and way == 'right':
 		if board[x][y+1]==unguessed:
 			board[x][y+1] = miss
 			return 0
@@ -92,7 +94,7 @@ def shootdirection(way,x,y,blocks):
 				return 2
 			if board[x][y] == hit:
 				return 1
-	elif way == 'left':
+	elif y-1>=0 and way == 'left':
 		if board[x][y-1]==unguessed:
 			board[x][y-1] = miss
 			return 0
@@ -111,7 +113,7 @@ def shootdirection(way,x,y,blocks):
 				return 2
 			if board[x][y] == hit:
 				return 1
-	elif way == 'down':
+	elif x+1<SIZE and way == 'down':
 		if board[x+1][y]==unguessed:
 			board[x+1][y] = miss
 			return 0
@@ -130,7 +132,7 @@ def shootdirection(way,x,y,blocks):
 				return 2
 			if board[x][y] == hit:
 				return 1
-	elif way == 'up':
+	elif x-1>=0 and way == 'up':
 		if board[x-1][y]==unguessed:
 			board[x-1][y] = miss
 			return 0
@@ -180,21 +182,30 @@ def target_mode(x, y):
 		if result == 0:		#result is a miss
 			del direction[DIR]
 		elif result == 1: 	#result is hits without sinking x,y and now we shoot in opposite direction of DIR
-			if DIR == 'up':
+			del direction[DIR]
+			if direction.get('down',0) and DIR == 'up':
+				print "up here"
 				shootdirection('down',x,y,direction['down'])
-				del direction['up']
+				print "here"
+				#del direction['up']
 				del direction['down']
-			elif DIR == 'down':
+			elif direction.get('up',0) and DIR == 'down':
+				print "up here"
 				shootdirection('up',x,y,direction['up'])
+				print "here"
 				del direction['up']
-				del direction['down']
-			elif DIR == 'right':
+				#del direction['down']
+			elif direction.get('left',0) and DIR == 'right':
+				print "up here"
 				shootdirection('left',x,y,direction['left'])
+				print "here"
 				del direction['left']
-				del direction['right']
-			elif DIR == 'left':
+				#del direction['right']
+			elif direction.get('right',0) and DIR == 'left':
+				print "up here"
 				shootdirection('right',x,y,direction['right'])
-				del direction['left']
+				print "here"
+				#del direction['left']
 				del direction['right']
 	flag = 0
 	for i in range(SIZE):
