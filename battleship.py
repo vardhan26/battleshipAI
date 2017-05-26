@@ -3,11 +3,11 @@
 from random import randint
 from pprint import pprint
 from copy import deepcopy
-shipnames = {'carrier':5,
-		'battleship':4,
-		'destroyer':3,
-		'cruiser':3,
-		'boat':2}
+shipnames = {'aircraft carrier':[],
+		'battleship':[],
+		'destroyer':[],
+		'cruiser':[],
+		'patrol boat':[]}
 ships = [5,4,3,3,2]
 unguessed = 0
 miss = 1
@@ -20,7 +20,7 @@ shootable = [unguessed]
 for i in ships:
 	shootable.append(i)
 
-def placeship(shipsize):		#function to place ships on the board randomly
+def placeship(shipsize, name):		#function to place ships on the board randomly
 	while True:
 		flag = 0
 		x = randint(0,9)
@@ -42,62 +42,34 @@ def placeship(shipsize):		#function to place ships on the board randomly
 			if orientation:
 				for i in range(shipsize):
 					board[x][y+i] = shipsize
+					shipnames[name] = shipnames[name] + [[x,y+i]]
 			else:
 				for i in range(shipsize):
 					board[x+i][y] = shipsize
+					shipnames[name] = shipnames[name] + [[x+i,y]]
 			break
 
-def checksink(x1,y1,x2,y2):				#checksink needs to be updated. fails if destroyer(3) and cruiser(3) ships are adjacent.
+def checksink(x1,y1,x2,y2):				
 	sizeofship = static_board[x2][y2]
-	if y2>y1:
-		c = 0
-		for i in range(sizeofship):
-			if y2-i>=0 and static_board[x2][y2-i]==sizeofship and board[x2][y2-i]==hit:
-				c+=1
-		if c==sizeofship:
-			for i in range(sizeofship):
-				board[x2][y2-i]=sink
-			ships.remove(sizeofship)
-			return 1
-		else:
-			return 0
-	elif y1>y2:
-		c = 0
-		for i in range(sizeofship):
-			if y2+i<SIZE and static_board[x2][y2+i]==sizeofship and board[x2][y2+i]==hit:
-				c+=1
-		if c==sizeofship:
-			for i in range(sizeofship):
-				board[x2][y2+i]=sink
-			ships.remove(sizeofship)
-			return 1
-		else:
-			return 0
-	elif x2>x1:
-		c = 0
-		for i in range(sizeofship):
-			if x2-i>=0 and static_board[x2-i][y2]==sizeofship and board[x2-i][y2]==hit:
-				c+=1
-		if c==sizeofship:
-			for i in range(sizeofship):
-				board[x2-i][y2]=sink
-			ships.remove(sizeofship)
-			return 1
-		else:
-			return 0
-	elif x1>x2:
-		c = 0
-		for i in range(sizeofship):
-			if x2+i<SIZE and static_board[x2+i][y2]==sizeofship and board[x2+i][y2]==hit:
-				c+=1
-		if c==sizeofship:
-			for i in range(sizeofship):
-				board[x2+i][y2]=sink
-			ships.remove(sizeofship)
-			return 1
-		else:
-			return 0
-
+	count = 0
+	nameofship = ' '
+	for key,values in shipnames.iteritems():
+		if [x2,y2] in values:
+			nameofship = key
+			break
+	if nameofship == ' ':
+		return 0
+	for xi,yi in shipnames[nameofship]:
+		if board[xi][yi] == hit:
+			count+=1
+	if count==sizeofship:
+		for xi,yi in shipnames[nameofship]:
+			board[xi][yi]=sink
+		print nameofship + " has been sunk!!!"
+		ships.remove(sizeofship)
+		return 1
+	else:
+		return 0
 
 
 def shootdirection(way,x,y,blocks):
@@ -107,7 +79,7 @@ def shootdirection(way,x,y,blocks):
 			return 0
 		else:
 			board[x][y+1] = hit
-			if not checksink(x,y,x,y+1):		#TODO make a function checksink to check sinking status of any ship after the last hit
+			if not checksink(x,y,x,y+1):		
 				for i in range(2,blocks+1):
 					if static_board[x][y+i] in ships:
 						board[x][y+i]=hit
@@ -237,8 +209,9 @@ def target_mode(x, y):
 #generate a board
 for i in range(SIZE):
 	board.append([unguessed]*SIZE)
-for j in ships:
-	placeship(j)
+names = iter(sorted(shipnames.iteritems()))
+for i,j in zip(ships,sorted(shipnames)):
+	placeship(i,j)
 pprint(board)
 static_board = deepcopy(board)
 counter=0
