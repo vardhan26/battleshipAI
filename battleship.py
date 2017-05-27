@@ -66,7 +66,7 @@ def checksink(x1,y1,x2,y2):
 	if count==sizeofship:
 		for xi,yi in shipnames[nameofship]:
 			board[xi][yi]=sink
-		print nameofship + " has been sunk!!!"
+		#print nameofship + " has been sunk!!!"
 		ships.remove(sizeofship)
 		return 1
 	else:
@@ -74,7 +74,7 @@ def checksink(x1,y1,x2,y2):
 
 
 def shootdirection(way,x,y,blocks):
-	print "%d 	%d" %(x,y)
+	#print "%d 	%d" %(x,y)
 	if y+1<SIZE and way == 'right':
 		if board[x][y+1]==unguessed:
 			board[x][y+1] = miss
@@ -173,11 +173,11 @@ def target_mode(x, y):
 		k+=1
 	direction['up']=k-1
 	while board[x][y]!=sink:
-		pprint(board)
-		print direction
-		print "%d 	%d" %(x,y)
+		#pprint(board)
+		#print direction
+		#print "%d 	%d" %(x,y)
 		DIR = max(direction, key=direction.get)
-		print DIR
+		#print DIR
 		result = shootdirection(DIR,x,y,direction[DIR])	#shoots in the direction DIR and returns the result
 		if result == 0:		#result is a miss
 			del direction[DIR]
@@ -215,7 +215,7 @@ for i in range(SIZE):
 names = iter(sorted(shipnames.iteritems()))
 for i,j in zip(ships,sorted(shipnames)):
 	placeship(i,j)
-pprint(board)
+#pprint(board)
 static_board = deepcopy(board)
 counter=0
 while True:
@@ -229,7 +229,7 @@ while True:
 	else:
 		board[x][y]=miss
 	if len(ships)==0:
-		pprint(board)
+		#pprint(board)
 		for i in range(SIZE):
 			for j in range(SIZE):
 				if board[i][j]==1:
