@@ -244,29 +244,41 @@ for mycount in range(1000):
 			#pprint(board)
 			#print direction
 			#print "%d 	%d" %(x,y)
-			DIR = max(direction, key=direction.get)
+			if (direction['right']+direction['left'])>(direction['up']+direction['down']):
+				if direction['right']>direction['left']:
+					DIR='right'
+				else:
+					DIR='left'
+			elif (direction['right']+direction['left'])<(direction['up']+direction['down']):
+				if direction['up']>direction['down']:
+					DIR='up'
+				else:
+					DIR='down'
+			else:
+				DIR=max(direction, key=direction.get)
 			#print DIR
 			result = shootdirection(DIR,x,y,direction[DIR])	#shoots in the direction DIR and returns the result
 			if result == 0:		#result is a miss
-				del direction[DIR]
+				direction[DIR]=0
 			elif result == 1: 	#result is hits without sinking x,y and now we shoot in opposite direction of DIR
-				del direction[DIR]
+				direction[DIR]=0
 				if direction.get('down',0) and DIR == 'up':
 					shootdirection('down',x,y,direction['down'])
 					#del direction['up']
-					del direction['down']
+					direction['down']=0
 				elif direction.get('up',0) and DIR == 'down':
 					shootdirection('up',x,y,direction['up'])
-					del direction['up']
+					direction['up']=0
 					#del direction['down']
 				elif direction.get('left',0) and DIR == 'right':
 					shootdirection('left',x,y,direction['left'])
-					del direction['left']
+					direction['left']=0
 					#del direction['right']
 				elif direction.get('right',0) and DIR == 'left':
 					shootdirection('right',x,y,direction['right'])
 					#del direction['left']
-					del direction['right']
+					direction['right']=0
+		del direction
 		flag = 0
 		for i in range(SIZE):
 			for j in range(SIZE):
