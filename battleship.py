@@ -32,7 +32,23 @@ for mycount in range(1000):
 			for j in range(SIZE):
 				probscore[i][j] = 0
 
+	def nscore(x,y):
+		c=0
+		if x in range(SIZE) and y in range(SIZE):
+			for [i,j] in [[0,1],[0,-1],[1,0],[-1,0]]:
+				try:
+					if radar[x+i][y+j]==sink or radar[x+i][y+j]==miss:
+						c+=1
+				except IndexError:
+					c+=1
+		return c
 
+
+	def findneighbourscore(x,y):
+		c=0
+		for [i,j] in [[0,1],[0,-1],[1,0],[-1,0]]:
+			c+=nscore(x+i,y+j)
+		return c
 
 	def calcprob(x,y,shipsize):
 		
@@ -305,6 +321,7 @@ for mycount in range(1000):
 		#x = randint(0,9)
 		#y = randint(0,9)
 		maxprob = 0
+		neighbourscore=[]
 		for i in range(SIZE):
 			for j in range(SIZE):
 				if radar[i][j] == unguessed:
@@ -315,7 +332,22 @@ for mycount in range(1000):
 				elif probscore[i][j]>maxprob:
 					bestprob = [[i,j]]
 					maxprob = probscore[i][j]
-		coords=random.choice(bestprob)
+		filter2 = []
+		bestneighbour=0
+		for [i,j] in bestprob:
+			neighbourscore.append(findneighbourscore(i,j))
+			if bestneighbour<max(neighbourscore):
+				bestneighbour=max(neighbourscore)
+				filter2 = [[i,j]]
+			elif bestneighbour==max(neighbourscore):
+				filter2.append([i,j])
+
+		coords=random.choice(filter2)
+		if (coords[0]+coords[1])%ships[-1]!=0:	
+			for [i,j] in filter2:
+				if (i+j)%ships[-1]==0:
+					coords = [i,j]
+					break
 		x = coords[0]
 		y = coords[1]
 		#pprint(probscore)
