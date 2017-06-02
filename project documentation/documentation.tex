@@ -14,8 +14,11 @@
    \section{work done so far}
    so far a we have made a basic console based version of the game. it is a very basic version which uses quite simple algorithms.
    
-   the algorithm used here is called hunt/target with parity. in this algorithm, we first randomly shoot in a checker board like pattern till a hit is found. once a hit has been found we try to sink that ship on which the hit was found. if there are no hits lift then and everthing is eithir in 'sink' state or 'miss' state or 'unguessed' state then we go back to the random shooting.
+   the algorithm used here is called hunt/target with parity. in this algorithm, we first randomly shoot in a checker board like pattern till a hit is found. once a hit has been found we try to sink that ship on which the hit was found. if there are no hits lift then and everthing is either in 'sink' state or 'miss' state or 'unguessed' state then we go back to the random shooting.
    
+   Once a hit is found, the direction with most unguessed points is chosen to shoot at.
+
+
 	the functions made so far are:
 	\begin{itemize}
    		
@@ -25,9 +28,27 @@
    		\item targetmode, finds the best possible direction to shoot in and recalls itself if a hit is left on the board after sink a ship
 	
 	\end{itemize}
+	
+	such an algorithm gave an average of around 56 moves to beat a random board when tested for 1000 games.
+	
+	the next algorithm used calculates the probability of every unguessed point in the grid having a ship. the point with the best probability is targeted. if multiple points have the maximum probability then a \textit{neighbour score} is calculated for each such point and the point with maximum neighbour score is shot at. if still multiple points qualify, then the point on the checker board like pattern is shot at. if still multiple points qualify, then any one of these points is chosen at random.
+	
+	Also, after a hit is found, instead of shooting in the direction with most unguessed points, we add the no. of unguessed points of 'up' with 'down' and 'left with 'right' and compare them. the directions which add upto the bigger one of them is chosen and the best direction is now the direction with the most unguessed points of these two.
+	
+	the functions made/changed for this algorithm are:
+	\begin{itemize}
+	
+		\item calcprob, calculates the probability of having a ship of a particular size over the entire board.
+		\item targetmode, changes were made as mentioned above for obtaining better shooting direction after a hit.
+		\item nscore, calculates the neighbour score of a given point.
+	\end{itemize}
+	
+	this approach was a significant improvement over the previous one as it resulted in an average of about 44 moves every 1000 games
    
    \section{future plans}
-   we aim to use a better algorithm to play the game as this algorithm is really slow and gives an average of about 55-60 moves in a game. we aim to bring this number down to at least 40-45 moves. we have seen that this may be done by calculating probability density over the entire board and hitting the position with maximum probability.
-   
-   After that, we will learn about pygame and work on the graphics of the game. After which, if time permits, we will work on an intelligent placement of ships based on past matches with the same player, instead of the random placement we have right now.
+   we aim to use the pygame library on this to make the game graphical instead of console based.
+  
+  Also, we plan to make the placement of ships intelligent, by keeping in the order of guesses made by the opponent in the previous games.
+  
+  We will keep trying to refine the algorithm and make it more efficient.
 \end{document}
