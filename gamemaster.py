@@ -1,17 +1,17 @@
-import battleship
+import battleship as p1
 
-battleship.boardgenerator()
+p1.boardgenerator()
 c=0
 while True:
 	try:
-		x,y = battleship.nextmove()
-		battleship.hitat(x,y)
-		if battleship.radar[x][y]==battleship.hit:
-			battleship.target_mode(x,y)
-		if len(battleship.ships)==0:
-			for i in range(battleship.SIZE):
-				for j in range(battleship.SIZE):
-					if battleship.radar[i][j] in [battleship.miss,battleship.sink]:
+		x,y = p1.nextmove()
+		p1.hitat(x,y)
+		if p1.radar[x][y]==p1.hit:
+			p1.target_mode(x,y)
+		if len(p1.ships)==0:
+			for i in range(p1.SIZE):
+				for j in range(p1.SIZE):
+					if p1.radar[i][j] in [p1.miss,p1.sink]:
 						c+=1
 			print "victory in %d moves" %(c)
 			break
