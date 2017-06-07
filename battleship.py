@@ -259,20 +259,3 @@ def target_mode(x, y):
 				break
 		if flag:
 			break
-
-
-
-boardgenerator()
-c=0
-while True:
-	x,y = nextmove()
-	hitat(x,y)
-	if radar[x][y]==hit:
-		target_mode(x,y)
-	if len(ships)==0:
-		for i in range(SIZE):
-			for j in range(SIZE):
-				if radar[i][j] in [miss,sink]:
-					c+=1
-		print "victory in %d moves" %(c)
-		break

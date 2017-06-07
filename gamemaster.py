@@ -16,4 +16,5 @@ while True:
 			print "victory in %d moves" %(c)
 			break
 	except IndexError:
+		print "yahan pahunche the"
 		break
