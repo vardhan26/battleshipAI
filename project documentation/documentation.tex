@@ -12,9 +12,9 @@
    Battleship is a board game played between two players. each player is supposed to place ships in two different oceans i.e 10x10 grids. the ships are of different sizes namely, aircraft carrier (5x1), battleship (4x1), destroyer (3x1), cruiser (3x1) and a patrol boat (2x1). they may be placed anywhere on the grids either horizontally or vertically. they may never overlap with each other but can be placed adjacent to each other.The players take turns alternatively. On each turn a player is supposed to fire (guess a point on opponent's grid) at the opponents ships which may result in either a 'miss' or a 'hit'. when all the points of a ship have been hit, it results in sinking of that ship. the first player to sink all of opponent's ships is declared the winner.
    
    \section{work done so far}
-   so far a we have made a basic console based version of the game. it is a very basic version which uses quite simple algorithms.
+   so far I have made a basic console based version of the game. it is a very basic version which uses quite simple algorithms.
    
-   the algorithm used here is called hunt/target with parity. in this algorithm, we first randomly shoot in a checker board like pattern till a hit is found. once a hit has been found we try to sink that ship on which the hit was found. if there are no hits lift then and everthing is either in 'sink' state or 'miss' state or 'unguessed' state then we go back to the random shooting.
+   the algorithm used here is called hunt/target with parity. in this algorithm, it first randomly shoots in a checker board like pattern till a hit is found. once a hit has been found it tries to sink that ship on which the hit was found. if there are no hits left then and everthing is either in 'sink' state or 'miss' state or 'unguessed' state then it goes back to the random shooting.
    
    Once a hit is found, the direction with most unguessed points is chosen to shoot at.
 
@@ -43,14 +43,16 @@
 		\item nscore, calculates the neighbour score of a given point.
 	\end{itemize}
 	
-	this approach was a significant improvement over the previous one as it resulted in an average of about 44 moves every 1000 games.
+	this approach was a significant improvement over the previous one as it resulted in an average of about 44.2 moves tested for 10000 games.
 	
 	I have also made a file \textit{gamemaster.py} which imports the code of the original file, \textit{battleship.py} and uses it to actually play the game.
+	
+	After this, I made changes to the code of battleship.py so that the \textit{targetmode} function and its descendant functions are never used.
    
    \section{future plans}
-   we aim to use the pygame library on this to make the game graphical instead of console based.
+   I aim to use the pygame library on this to make the game graphical instead of console based.
   
-  Also, we plan to make the placement of ships intelligent, by keeping in the order of guesses made by the opponent in the previous games.
+  Also, I plan to make the placement of ships intelligent, by keeping in the order of guesses made by the opponent in the previous games.
   
-  We will keep trying to refine the algorithm and make it more efficient.
+  I will keep trying to refine the algorithm and make it more efficient.
 \end{document}

@@ -19,8 +19,10 @@ radar = []
 probscore = []
 neighbourscore = []
 bestprob = []
+hitfound = []
 
 def checksink(x2,y2):				
+	tosink = []
 	sizeofship = board[x2][y2]
 	if board[x2][y2] in ships:
 		board[x2][y2]=hit
@@ -37,21 +39,49 @@ def checksink(x2,y2):
 			count+=1
 	if count==sizeofship:
 		for xi,yi in shipnames[nameofship]:
-			radar[xi][yi]=sink
+			tosink.append([xi,yi])
 		#print nameofship + " has been sunk!!!"
 		ships.remove(sizeofship)
-		return 1
+		return tosink
 	else:
 		return 0
+
+
+def updateradar(x,y,state):
+	global hitfound
+	try:	
+		if state == hit or state==miss:
+			radar[x][y]=state
+			if state==hit:
+				hitfound.append([x,y])
+				#print x,y
+		else:
+			for [xi,yi] in state:
+				radar[xi][yi]=sink
+				if [xi,yi] in hitfound:
+					hitfound.remove([xi,yi])
+				#print xi,yi
+			# if radar[hitfound[0]][hitfound[1]]==sink:
+			# 	hitfound=[]
+			# 	for i in range(SIZE):
+			# 		for j in range(SIZE):
+			# 			if radar[i][j]==hit:
+			# 				hitfound = [i,j]
+			# 				break
+			# 		if len(hitfound)!=0:
+			# 			break
+	except TypeError:
+		print "not an applicable state"
+
 
 def hitat(x,y):
 	try:
 		if board[x][y] in ships:
-			radar[x][y]=hit
-			checksink(x,y)
+			sinker = checksink(x,y)
+			if sinker!=0:
+				return sinker
 			return hit
 		else:
-			radar[x][y]=miss
 			return miss
 	except IndexError:
 		print "index error, x and y must lie between 0 to 9 (inclusive)"
@@ -79,25 +109,55 @@ def findneighbourscore(x,y):
 		c+=nscore(x+i,y+j)
 	return c
 
-def calcprob(x,y,shipsize):	
-	#horizontal
-	flag = 0
-	for i in range(shipsize):
-		if y+i>=SIZE or radar[x][y+i]!=unguessed:
-			flag = 1
-			break
-	if flag==0:
+def calcprob(x,y,shipsize):		#try the hitfound append thing
+	if len(hitfound)!=0:
+		for [xi,yi] in hitfound:
+			if y==yi:
+				f=0
+				if x<=xi and x+shipsize-1>=xi and x+shipsize-1<SIZE:
+					for i in range(shipsize):
+						if radar[x+i][y] not in [hit,unguessed]:
+							f=1
+							break
+					if f==0:
+						for i in range(shipsize):
+							if radar[x+i][y]==unguessed:
+								probscore[x+i][y]+=1
+			if x==xi:
+				f=0
+				if y<=yi and y+shipsize-1>=yi and y+shipsize-1<SIZE:
+					for i in range(shipsize):
+						if radar[x][y+i] not in [hit,unguessed]:
+							f=1
+							break
+					if f==0:
+						for i in range(shipsize):
+							if radar[x][y+i]==unguessed:
+								probscore[x][y+i]+=1
+
+
+
+	else:
+		#horizontal
+		flag = 0
 		for i in range(shipsize):
-			probscore[x][y+i]+=1
-	#vertical
-	flag = 0
-	for i in range(shipsize):
-		if x+i>=SIZE or radar[x+i][y]!=unguessed:
-			flag = 1
-			break
-	if flag==0:
+			if y+i>=SIZE or radar[x][y+i]!=unguessed:
+				flag = 1
+				break
+		if flag==0:
+			for i in range(shipsize):
+				if radar[x][y+i]==unguessed:
+					probscore[x][y+i]+=1
+		#vertical
+		flag = 0
 		for i in range(shipsize):
-			probscore[x+i][y]+=1
+			if x+i>=SIZE or radar[x+i][y]!=unguessed:
+				flag = 1
+				break
+		if flag==0:
+			for i in range(shipsize):
+				if radar[x+i][y]==unguessed:
+					probscore[x+i][y]+=1
 
 def shootdirection(way,x,y,blocks):
 	#print "%d 	%d" %(x,y)
@@ -161,16 +221,18 @@ def boardgenerator():
 	#names = iter(sorted(shipnames.iteritems()))
 	for i,j in zip(ships,sorted(shipnames)):
 		placeship(i,j)
+	#pprint(board)
 
 def nextmove():
 	global maxprob
 	maxprob=0
 	global neighbourscore
 	neighbourscore=[]
+	coords=[]
 	global bestprob
 	for i in range(SIZE):
 		for j in range(SIZE):
-			if radar[i][j] == unguessed:
+			if radar[i][j] == unguessed or radar[i][j]==hit:
 				for sh in ships:
 					calcprob(i,j,sh)
 			if probscore[i][j]==maxprob:
@@ -178,22 +240,59 @@ def nextmove():
 			elif probscore[i][j]>maxprob:
 				bestprob = [[i,j]]
 				maxprob = probscore[i][j]
-	filter2 = []
-	bestneighbour=0
-	for [i,j] in bestprob:
-		neighbourscore.append(findneighbourscore(i,j))
-		if bestneighbour<max(neighbourscore):
-			bestneighbour=max(neighbourscore)
-			filter2 = [[i,j]]
-		elif bestneighbour==max(neighbourscore):
-			filter2.append([i,j])
-
-	coords=random.choice(filter2)
-	if (coords[0]+coords[1])%ships[-1]!=0:	
-		for [i,j] in filter2:
-			if (i+j)%ships[-1]==0:
-				coords = [i,j]
-				break
+	random.shuffle(bestprob)
+	if len(hitfound)==0:	
+		filter2 = []
+		bestneighbour=0
+		for [i,j] in bestprob:
+			neighbourscore.append(findneighbourscore(i,j))
+			if bestneighbour<max(neighbourscore):
+				bestneighbour=max(neighbourscore)
+				filter2 = [[i,j]]
+			elif bestneighbour==max(neighbourscore):
+				filter2.append([i,j])
+		random.shuffle(filter2)
+		coords=random.choice(filter2)
+		if (coords[0]+coords[1])%ships[-1]!=0:
+			for [i,j] in filter2:
+				if (i+j)%ships[-1]==0:
+					coords = [i,j]
+					break
+	else:
+		#pprint(probscore)
+		#input()
+		if len(hitfound)==1:
+			coords = random.choice(bestprob)
+		else:
+			if hitfound[-1][0]==hitfound[0][0]:
+				x1=hitfound[0][0]
+				y1=probscore[hitfound[0][0]].index(max(probscore[hitfound[0][0]]))
+				if probscore[x1][y1]!=0:
+					coords = [x1,y1]
+				else:
+					for [i,j] in bestprob:
+						if j==hitfound[0][1]:
+							coords=[i,j]
+							break
+			if hitfound[-1][1]==hitfound[0][1]:
+				y1=hitfound[0][1]
+				x1=0
+				maxx=0
+				for i in range(SIZE):
+					if maxx<probscore[i][y1]:
+						x1=i
+						maxx=probscore[i][y1]
+				if probscore[x1][y1]!=0:
+					coords = [x1,y1]
+				else:
+					for [i,j] in bestprob:
+						if i==hitfound[0][0]:
+							coords=[i,j]
+							break
+						
+	if len(coords)==0:
+		coords=random.choice(bestprob)
+	#print coords
 	cleanprob()
 	return coords
 
