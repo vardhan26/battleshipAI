@@ -41,12 +41,14 @@ hit=7
 miss=1
 sink=9
 unguessed=0
-matches = 100
+matches = 1000
 
-p1.boardgenerator()
-p2.boardgenerator()
+
 
 def main():
+	p1.boardgenerator()
+	p2.boardgenerator()
+
 	global FPSCLOCK,DISPLAYSURF
 	pygame.init()
 	FPSCLOCK = pygame.time.Clock()
@@ -54,10 +56,19 @@ def main():
 
 	pygame.display.set_caption('BATTLESHIP')
 	DISPLAYSURF.fill(bgcolor)
+	counter = 0
+	abc=0
+	noofmoves=0
 
 	while True:
+		noofmoves+=1
 		DISPLAYSURF.fill(bgcolor)
 		drawRadar(p1.radar,p2.radar)
+
+		if abc>=matches:
+			print "player 1 won %d out of %d matches" %(counter,matches)
+			pygame.quit()
+			sys.exit()
 
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type==KEYUP and event.key == K_ESCAPE):
@@ -69,6 +80,7 @@ def main():
 		p1.updateradar(x,y,move)
 		if len(p1.ships)==0:
 			#print "victory in %d moves" %(c)
+			counter+=1
 			p1.board = []
 			p1.radar = []
 			p1.probscore = []
@@ -97,8 +109,17 @@ def main():
 			p2.ships = [5,4,3,3,2]
 			p2.oppships = [5,4,3,3,2]
 			p2.maxprob=0
-			pygame.quit()
-			sys.exit()
+			if abc>=matches:
+				print "player 1 won %d out of %d matches" %(counter,matches)
+				pygame.quit()
+				sys.exit()
+			else:
+				abc+=1
+				print noofmoves
+				noofmoves=0
+				p1.boardgenerator()
+				p2.boardgenerator()
+
 		
 		x1,y1 = p2.nextmove()
 		move1 = p1.hitat(x1,y1)
@@ -133,8 +154,17 @@ def main():
 			p2.ships = [5,4,3,3,2]
 			p2.oppships = [5,4,3,3,2]
 			p2.maxprob=0
-			pygame.quit()
-			sys.exit()
+			if abc>=matches:
+				print "player 1 won %d out of %d matches" %(counter,matches)
+				pygame.quit()
+				sys.exit()
+			else:
+				abc+=1
+				print noofmoves
+				noofmoves=0
+				p1.boardgenerator()
+				p2.boardgenerator()
+
 		pygame.display.update()
 		FPSCLOCK.tick(FPS)
 
@@ -166,5 +196,6 @@ def drawRadar(radar1,radar2):
 				pygame.draw.rect(DISPLAYSURF,black,(left,top,boxsize,boxsize))
 
 if __name__ == '__main__':
-	main()
+		main()
+
 
