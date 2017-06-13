@@ -14,6 +14,7 @@ miss = 1
 hit = 7
 sink = 9
 SIZE = 10
+scoreadd=100
 maxprob=0
 board = []
 radar = []
@@ -21,6 +22,9 @@ probscore = []
 neighbourscore = []
 bestprob = []
 hitfound = []
+statscore = []
+for i in range(SIZE):
+	statscore.append([0]*SIZE)
 
 def checksink(x2,y2):				
 	tosink = []
@@ -62,22 +66,17 @@ def updateradar(x,y,state):
 				if [xi,yi] in hitfound:
 					hitfound.remove([xi,yi])
 			oppships.remove(len(state))
-				#print xi,yi
-			# if radar[hitfound[0]][hitfound[1]]==sink:
-			# 	hitfound=[]
-			# 	for i in range(SIZE):
-			# 		for j in range(SIZE):
-			# 			if radar[i][j]==hit:
-			# 				hitfound = [i,j]
-			# 				break
-			# 		if len(hitfound)!=0:
-			# 			break
 	except TypeError:
 		print "not an applicable state"
 
 
 def hitat(x,y):
+	global scoreadd
+	global statscore
 	try:
+		statscore[x][y]+=scoreadd
+		scoreadd-=1
+		statscore[x][y]=int((statscore[x][y])/2)
 		if board[x][y] in ships:
 			sinker = checksink(x,y)
 			if sinker!=0:
@@ -187,33 +186,69 @@ def shootdirection(way,x,y,blocks):
 
 
 def placeship(shipsize, name):		#function to place ships on the board randomly
-	while True:
-		flag = 0
-		x = random.randint(0,9)
-		y = random.randint(0,9)
-		if board[x][y]!=unguessed:
-			continue
-		orientation = random.randint(0,1)
-		if orientation:
-			for i in range(shipsize):
-				if y+i>=SIZE or board[x][y+i]!=unguessed:
-					flag = 1
+	flag = 0
+	orientation = 0
+	maxscore =100
+	curscore1,curscore2 = 0,0
+	bestpos = []
+	curpos1 = []
+	curpos2 = []
+	# x = random.randint(0,9)
+	# y = random.randint(0,9)
+	# if board[x][y]!=unguessed:
+	# 	continue
+	# orientation = random.randint(0,1)
+	# if orientation:
+	# 	for i in range(shipsize):
+	# 		if y+i>=SIZE or board[x][y+i]!=unguessed:
+	# 			flag = 1
+	# 			break
+	# else:
+	# 	for i in range(shipsize):
+	# 		if x+i>=SIZE or board[x+i][y]!=unguessed:
+	# 			flag = 1
+	# 			break
+	for i in range(SIZE):
+		for j in range(SIZE):
+			for k in range(shipsize):
+				curpos1.append([i,j+k])
+				if j+k>=SIZE or board[i][j+k]!=unguessed:
+					curscore1 = 0
+					flag+=1
+					curpos1 = []
 					break
-		else:
-			for i in range(shipsize):
-				if x+i>=SIZE or board[x+i][y]!=unguessed:
-					flag = 1
+				if statscore[i][j+k]>=curscore1:
+					curscore1 = statscore[i][j+k]
+			for k in range(shipsize):
+				curpos2.append([i+k,j])
+				if i+k>=SIZE or board[i+k][j]!=unguessed:
+					curscore2 = 0
+					flag+=1
+					curpos2 = []
 					break
-		if not flag:
-			if orientation:
-				for i in range(shipsize):
-					board[x][y+i] = shipsize
-					shipnames[name] = shipnames[name] + [[x,y+i]]
-			else:
-				for i in range(shipsize):
-					board[x+i][y] = shipsize
-					shipnames[name] = shipnames[name] + [[x+i,y]]
-			break
+				if statscore[i+k][j]>=curscore2:
+					curscore2 = statscore[i+k][j]
+			if flag<2:
+				if curscore1>min(curscore2,curscore1):
+					if len(curpos2)>0:	
+						curpos1 = curpos2
+						curscore1 = curscore2
+				elif len(curpos1)==0:
+					curpos1=curpos2
+					curscore1=curscore2
+				if curscore1<=maxscore:
+					maxscore = curscore1
+					bestpos = curpos1
+			flag=0
+			curscore1,curscore2 = 0,0
+			curpos1,curpos2 = [],[]
+	print bestpos
+	for i in range(shipsize):
+		board[bestpos[i][0]][bestpos[i][1]]=shipsize
+	shipnames[name] = shipnames[name] + bestpos
+
+
+
 
 def boardgenerator():
 	for i in range(SIZE):
@@ -223,7 +258,7 @@ def boardgenerator():
 	#names = iter(sorted(shipnames.iteritems()))
 	for i,j in zip(ships,sorted(shipnames)):
 		placeship(i,j)
-	#pprint(board)
+	pprint(board)
 
 def nextmove():
 	global maxprob

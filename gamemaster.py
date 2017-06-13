@@ -41,7 +41,7 @@ hit=7
 miss=1
 sink=9
 unguessed=0
-matches = 1000
+matches = 10
 
 
 
@@ -66,7 +66,7 @@ def main():
 		drawRadar(p1.radar,p2.radar)
 
 		if abc>=matches:
-			print "player 1 won %d out of %d matches" %(counter,matches)
+			print "player 2 won %d out of %d matches" %(counter,matches)
 			pygame.quit()
 			sys.exit()
 
@@ -80,6 +80,7 @@ def main():
 		p1.updateradar(x,y,move)
 		if len(p1.ships)==0:
 			#print "victory in %d moves" %(c)
+			pprint(p1.statscore)
 			counter+=1
 			p1.board = []
 			p1.radar = []
@@ -94,6 +95,7 @@ def main():
 						'patrol boat':[]}
 			p1.ships = [5,4,3,3,2]
 			p1.oppships = [5,4,3,3,2]
+			p1.scoreadd = 100
 			p1.maxprob=0
 			p2.board = []
 			p2.radar = []
@@ -126,6 +128,7 @@ def main():
 		p2.updateradar(x1,y1,move1)
 		if len(p2.ships)==0:
 			#print "victory in %d moves" %(c)
+			pprint(p1.statscore)
 			p1.board = []
 			p1.radar = []
 			p1.probscore = []
@@ -140,6 +143,7 @@ def main():
 			p1.ships = [5,4,3,3,2]
 			p1.oppships = [5,4,3,3,2]
 			p1.maxprob=0
+			p1.scoreadd = 100
 			p2.board = []
 			p2.radar = []
 			p2.probscore = []
