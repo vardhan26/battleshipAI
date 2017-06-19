@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage[super]{nth}
 \title{Battleship AI: documentation}
 \author{Vardhan Gupta}
 \date{may-june 2017}
@@ -12,8 +13,8 @@
    Battleship is a board game played between two players. each player is supposed to place ships in two different oceans i.e 10x10 grids. the ships are of different sizes namely, aircraft carrier (5x1), battleship (4x1), destroyer (3x1), cruiser (3x1) and a patrol boat (2x1). they may be placed anywhere on the grids either horizontally or vertically. they may never overlap with each other but can be placed adjacent to each other.The players take turns alternatively. On each turn a player is supposed to fire (guess a point on opponent's grid) at the opponents ships which may result in either a 'miss' or a 'hit'. when all the points of a ship have been hit, it results in sinking of that ship. the first player to sink all of opponent's ships is declared the winner.
    
    \section{work done so far}
-   so far I have made a basic console based version of the game. it is a very basic version which uses quite simple algorithms.
    
+   \subsection{algorithm 1}
    the algorithm used here is called hunt/target with parity. in this algorithm, it first randomly shoots in a checker board like pattern till a hit is found. once a hit has been found it tries to sink that ship on which the hit was found. if there are no hits left then and everthing is either in 'sink' state or 'miss' state or 'unguessed' state then it goes back to the random shooting.
    
    Once a hit is found, the direction with most unguessed points is chosen to shoot at.
@@ -29,7 +30,9 @@
 	
 	\end{itemize}
 	
-	such an algorithm gave an average of around 56 moves to beat a random board when tested for 1000 games.
+	such an algorithm gave an average of around $56$ moves to beat a random board when tested for $10000$ games.
+	
+	\subsection{algorithm 2}
 	
 	the next algorithm used calculates the probability of every unguessed point in the grid having a ship. the point with the best probability is targeted. if multiple points have the maximum probability then a \textit{neighbour score} is calculated for each such point and the point with maximum neighbour score is shot at. if still multiple points qualify, then the point on the checker board like pattern is shot at. if still multiple points qualify, then any one of these points is chosen at random.
 	
@@ -43,16 +46,21 @@
 		\item nscore, calculates the neighbour score of a given point.
 	\end{itemize}
 	
-	this approach was a significant improvement over the previous one as it resulted in an average of about 44.2 moves tested for 10000 games.
+	this approach was a significant improvement over the previous one as it resulted in an average of about $44$ moves tested for $10000$ games. This was the result with a random placement of opponent's ships on each game, subject to the constraints of the game and an intelligent placement might result in a worse average.
 	
-	I have also made a file \textit{gamemaster.py} which imports the code of the original file, \textit{battleship.py} and uses it to actually play the game.
+	\subsubsection{intelligent ship placement}
 	
-	After this, I made changes to the code of battleship.py so that the \textit{targetmode} function and its descendant functions are never used.
+	So far, I had only been placing the ships randomly. A better way to place the ships would be to see the points where the opponent shoots early in the game and not place any of the ships at those points. This was done by using a 10x10 matrix with each point on the grid having an initial score of $0$ and as the opponent shoots at the player board the corresponding point on this matrix get an incrementation in score. i.e.\ $100$ for the \nth{1} point, $99$ for the \nth{2}, etc. based on this score, the ships will now be placed on the best possible blocks with lowest score. On competeting with the same algorithm with random placement of ships, It won about $9$ out of every $10$ games.
+	
+	\subsection{the gamemaster file} 
+	
+	I have also made a file \textit{gamemaster.py} which imports the code of the original file, \textit{battleship.py} and uses it to actually play the game. what this file does is that it will ask a player the coordinates of the point where they want to play their next move. how they choose those particular coordinates is subject to the internal workings of their algorithm. then gamemaster "shoots" at the said coordinates of the opponent's board. the opponent now gives a feedback based on whether the player has missed or hit or sunk a ship. based on this feedback the player will now update their radar. the same process is then repeated with the roles reversed and this continues until someone wins. This file is also where the pygame module is used, to show the games played graphically.
+	
+	
    
    \section{future plans}
-   I aim to use the pygame library on this to make the game graphical instead of console based.
-  
-  Also, I plan to make the placement of ships intelligent, by keeping in the order of guesses made by the opponent in the previous games.
   
   I will keep trying to refine the algorithm and make it more efficient.
+  
+  one particular thing that I plan to do now is to make the attacking algorithm dynamic enough to be able to beat ship placements designed to play against the current algorithm e.g.\ \textit{always placing ships on the corners.} this might be done in a similar fashion as the intelligent ship placement. 
 \end{document}
