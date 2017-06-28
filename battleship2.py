@@ -1,6 +1,7 @@
 import random
 from pprint import pprint
 from copy import deepcopy
+import numpy as np
 
 shipnames = {'aircraft carrier':[],
 			'battleship':[],
@@ -14,13 +15,16 @@ miss = 1
 hit = 7
 sink = 9
 SIZE = 10
-maxprob=0
+maxprob = 0
+matchcount = 0
+dispersion = 0.000
 board = []
 radar = []
 probscore = []
 neighbourscore = []
 bestprob = []
 hitfound = []
+oppstatscore = np.zeros((10,10),dtype=int)
 
 def checksink(x2,y2):				
 	tosink = []
@@ -55,8 +59,12 @@ def updateradar(x,y,state):
 			radar[x][y]=state
 			if state==hit:
 				hitfound.append([x,y])
+				oppstatscore[x][y]+=1
+			else:
+				oppstatscore[x][y]-=2
 				#print x,y
 		else:
+			oppstatscore[x][y]+=1
 			for [xi,yi] in state:
 				radar[xi][yi]=sink
 				if [xi,yi] in hitfound:
@@ -216,6 +224,10 @@ def placeship(shipsize, name):		#function to place ships on the board randomly
 			break
 
 def boardgenerator():
+	global oppstatscore,matchcount,dispersion
+	matchcount+=1
+	if matchcount%100==0:
+		oppstatscore=oppstatscore/5
 	for i in range(SIZE):
 		radar.append([unguessed]*SIZE)
 		board.append([unguessed]*SIZE)
@@ -224,9 +236,38 @@ def boardgenerator():
 	for i,j in zip(ships,sorted(shipnames)):
 		placeship(i,j)
 	#pprint(board)
+	v = np.var(oppstatscore)
+	print v
+	mean = np.mean(oppstatscore)
+	print mean
+	try:
+		#print v/(mean*mean)
+		dispersion = v/(mean*mean)
+	except ZeroDivisionError:
+		print "mean is 0"
+		dispersion=0
+	oppstatscore=oppstatscore+np.ones((SIZE,SIZE),dtype=int)
+	#pprint(oppstatscore)
+
+def bestml():
+	maxstat=-250
+	beststat=[]
+	for i in range(SIZE):
+		for j in range(SIZE):
+			if radar[i][j]!=unguessed:
+				continue
+			if oppstatscore[i][j]>maxstat:
+				maxstat=oppstatscore[i][j]
+				beststat = [[i,j]]
+			elif oppstatscore[i][j]==maxstat:
+				beststat.append([i,j])
+	return random.choice(beststat)
+
+
+
 
 def nextmove():
-	global maxprob
+	global maxprob,matchcount
 	maxprob=0
 	global neighbourscore
 	neighbourscore=[]
@@ -243,7 +284,10 @@ def nextmove():
 				bestprob = [[i,j]]
 				maxprob = probscore[i][j]
 	random.shuffle(bestprob)
-	if len(hitfound)==0:	
+	if len(hitfound)==0:
+		if dispersion>1 and matchcount>75:
+				coords = bestml()
+				return coords
 		filter2 = []
 		bestneighbour=0
 		for [i,j] in bestprob:

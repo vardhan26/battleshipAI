@@ -3,7 +3,7 @@ import battleship2 as p2
 from pprint import pprint
 import pygame,sys
 from pygame.locals import *
-FPS = 30
+FPS = 1000
 
 windowwidth = 1280
 windowheight = 720
@@ -22,7 +22,7 @@ gray = (100,100,100)
 navyblue = (60,60,100)
 white = (255,255,255)
 red = (255,0,0)
-green = (0,255,0)
+green = (0,120,0)
 blue = (0,0,255)
 yellow = (255,255,0)
 orange = (255,128,0)
@@ -34,6 +34,10 @@ bgcolor = navyblue
 lightbgcolor = gray
 boxcolor = white
 highlightcolor = blue
+BASICFONTSIZE = 24
+TEXTCOLOR = white
+
+
 
 
 names=['aircraft carrier','battleship','destroyer','cruiser','patrol boat']
@@ -41,32 +45,35 @@ hit=7
 miss=1
 sink=9
 unguessed=0
-matches = 10
-
+counter=0
+matches = 1000
+score=0
 
 
 def main():
+	global counter,score
 	p1.boardgenerator()
 	p2.boardgenerator()
 
 	global FPSCLOCK,DISPLAYSURF
 	pygame.init()
+	BASICFONT = pygame.font.Font('freesansbold.ttf', BASICFONTSIZE)
+	#score = counter
 	FPSCLOCK = pygame.time.Clock()
 	DISPLAYSURF=pygame.display.set_mode((windowwidth,windowheight))
-
+	
 	pygame.display.set_caption('BATTLESHIP')
 	DISPLAYSURF.fill(bgcolor)
-	counter = 0
 	abc=0
 	noofmoves=0
 
 	while True:
 		noofmoves+=1
 		DISPLAYSURF.fill(bgcolor)
-		drawRadar(p1.radar,p2.radar)
+		drawRadar(p1.radar,p2.radar,BASICFONT)
 
 		if abc>=matches:
-			print "player 2 won %d out of %d matches" %(counter,matches)
+			print "player 2 won %d out of %d matches" %(score,matches)
 			pygame.quit()
 			sys.exit()
 
@@ -80,7 +87,8 @@ def main():
 		p1.updateradar(x,y,move)
 		if len(p1.ships)==0:
 			#print "victory in %d moves" %(c)
-			pprint(p1.statscore)
+			#pprint(p1.statscore)
+			score+=1
 			counter+=1
 			p1.board = []
 			p1.radar = []
@@ -128,7 +136,8 @@ def main():
 		p2.updateradar(x1,y1,move1)
 		if len(p2.ships)==0:
 			#print "victory in %d moves" %(c)
-			pprint(p1.statscore)
+			#pprint(p1.statscore)
+			counter+=1
 			p1.board = []
 			p1.radar = []
 			p1.probscore = []
@@ -177,7 +186,7 @@ def leftTopCoordsOfBox(boxx,boxy):
 	top = boxy*(boxsize+gapsize) + ymargin
 	return (left,top)
 
-def drawRadar(radar1,radar2):
+def drawRadar(radar1,radar2,BASICFONT):
 	for x in range(boardwidth):
 		for y in range(boardheight):
 			left,top = leftTopCoordsOfBox(x,y)
@@ -198,6 +207,17 @@ def drawRadar(radar1,radar2):
 				pygame.draw.rect(DISPLAYSURF,blue,(left,top,boxsize,boxsize))
 			elif radar2[y][x] == sink:
 				pygame.draw.rect(DISPLAYSURF,black,(left,top,boxsize,boxsize))
+	pygame.draw.rect(DISPLAYSURF,orange,(360,50,90,60))
+	pygame.draw.rect(DISPLAYSURF,orange,(830,50,90,60))
+	textSurf1 = BASICFONT.render(str(counter-score), True, TEXTCOLOR)
+	textSurf2 = BASICFONT.render(str(score), True, TEXTCOLOR)
+	textRect1 = textSurf1.get_rect()
+	textRect2 = textSurf2.get_rect()
+	textRect1.center = 405,80
+	textRect2.center = 875,80
+	DISPLAYSURF.blit(textSurf1, textRect1)
+	DISPLAYSURF.blit(textSurf2, textRect2)
+
 
 if __name__ == '__main__':
 		main()

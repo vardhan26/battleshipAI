@@ -1,6 +1,7 @@
 import random
 from pprint import pprint
 from copy import deepcopy
+import numpy as np
 
 shipnames = {'aircraft carrier':[],
 			'battleship':[],
@@ -15,13 +16,16 @@ hit = 7
 sink = 9
 SIZE = 10
 scoreadd=100
+dispersion=0.000
 maxprob=0
+matchcount=0
 board = []
 radar = []
 probscore = []
 neighbourscore = []
 bestprob = []
 hitfound = []
+oppstatscore = np.zeros((10,10),dtype=int)
 statscore = []
 for i in range(SIZE):
 	statscore.append([0]*SIZE)
@@ -58,9 +62,13 @@ def updateradar(x,y,state):
 		if state == hit or state==miss:
 			radar[x][y]=state
 			if state==hit:
+				oppstatscore[x][y]+=1
 				hitfound.append([x,y])
+			else:
+				oppstatscore[x][y]-=2
 				#print x,y
 		else:
+			oppstatscore[x][y]+=1
 			for [xi,yi] in state:
 				radar[xi][yi]=sink
 				if [xi,yi] in hitfound:
@@ -242,7 +250,7 @@ def placeship(shipsize, name):		#function to place ships on the board randomly
 			flag=0
 			curscore1,curscore2 = 0,0
 			curpos1,curpos2 = [],[]
-	print bestpos
+	#print bestpos
 	for i in range(shipsize):
 		board[bestpos[i][0]][bestpos[i][1]]=shipsize
 	shipnames[name] = shipnames[name] + bestpos
@@ -251,6 +259,10 @@ def placeship(shipsize, name):		#function to place ships on the board randomly
 
 
 def boardgenerator():
+	global oppstatscore,dispersion,matchcount
+	matchcount+=1
+	if matchcount%100==0:
+		oppstatscore=oppstatscore/5
 	for i in range(SIZE):
 		radar.append([unguessed]*SIZE)
 		board.append([unguessed]*SIZE)
@@ -258,7 +270,32 @@ def boardgenerator():
 	#names = iter(sorted(shipnames.iteritems()))
 	for i,j in zip(ships,sorted(shipnames)):
 		placeship(i,j)
-	pprint(board)
+	v = np.var(oppstatscore)
+	#print v
+	mean = np.mean(oppstatscore)
+	#print mean
+	try:
+		dispersion = v/(mean*mean)
+		print dispersion
+	except ZeroDivisionError:
+		dispersion=0
+	oppstatscore=oppstatscore+np.ones((SIZE,SIZE),dtype=int)
+	pprint(oppstatscore)
+	#pprint(board)
+
+def bestml():
+	maxstat=-250
+	beststat=[]
+	for i in range(SIZE):
+		for j in range(SIZE):
+			if radar[i][j]!=unguessed:
+				continue
+			if oppstatscore[i][j]>maxstat:
+				maxstat=oppstatscore[i][j]
+				beststat = [[i,j]]
+			elif oppstatscore[i][j]==maxstat:
+				beststat.append([i,j])
+	return random.choice(beststat)
 
 def nextmove():
 	global maxprob
@@ -279,6 +316,9 @@ def nextmove():
 				maxprob = probscore[i][j]
 	random.shuffle(bestprob)
 	if len(hitfound)==0:	
+		if dispersion>0.7 and matchcount>75:
+				coords = bestml()
+				return coords
 		filter2 = []
 		bestneighbour=0
 		for [i,j] in bestprob:
