@@ -13,6 +13,7 @@ oppships=[5,4,3,3,2]
 unguessed = 0
 miss = 1
 hit = 7
+checkeredpattern=0
 sink = 9
 SIZE = 10
 scoreadd=100
@@ -29,6 +30,25 @@ oppstatscore = np.zeros((10,10),dtype=int)
 statscore = []
 for i in range(SIZE):
 	statscore.append([0]*SIZE)
+
+def resetplayer(self):
+	self.board = []
+	self.radar = []
+	self.probscore = []
+	self.neighbourscore = []
+	self.bestprob = []
+	self.hitfound = []
+	self.shipnames = {'aircraft carrier':[],
+				'battleship':[],
+				'destroyer':[],
+				'cruiser':[],
+				'patrol boat':[]}
+	self.ships = [5,4,3,3,2]
+	self.oppships = [5,4,3,3,2]
+	self.scoreadd = 100
+	self.maxprob=0
+	self.checkeredpattern=random.randint(0,1)
+
 
 def checksink(x2,y2):				
 	tosink = []
@@ -298,7 +318,7 @@ def bestml():
 	return random.choice(beststat)
 
 def nextmove():
-	global maxprob
+	global maxprob,checkeredpattern
 	maxprob=0
 	global neighbourscore
 	neighbourscore=[]
@@ -330,9 +350,9 @@ def nextmove():
 				filter2.append([i,j])
 		random.shuffle(filter2)
 		coords=random.choice(filter2)
-		if (coords[0]+coords[1])%oppships[-1]!=0:
+		if (coords[0]+coords[1])%oppships[-1]!=checkeredpattern:
 			for [i,j] in filter2:
-				if (i+j)%oppships[-1]==0:
+				if (i+j)%oppships[-1]==checkeredpattern:
 					coords = [i,j]
 					break
 	else:

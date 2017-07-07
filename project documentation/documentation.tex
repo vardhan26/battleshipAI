@@ -12,7 +12,7 @@
    \section{the battleship game}
    Battleship is a board game played between two players. each player is supposed to place ships in two different oceans i.e 10x10 grids. the ships are of different sizes namely, aircraft carrier (5x1), battleship (4x1), destroyer (3x1), cruiser (3x1) and a patrol boat (2x1). they may be placed anywhere on the grids either horizontally or vertically. they may never overlap with each other but can be placed adjacent to each other.The players take turns alternatively. On each turn a player is supposed to fire (guess a point on opponent's grid) at the opponents ships which may result in either a 'miss' or a 'hit'. when all the points of a ship have been hit, it results in sinking of that ship. the first player to sink all of opponent's ships is declared the winner.
    
-   \section{work done so far}
+   \section{The project}
    
    \subsection{algorithm 1}
    the algorithm used here is called hunt/target with parity. in this algorithm, it first randomly shoots in a checker board like pattern till a hit is found. once a hit has been found it tries to sink that ship on which the hit was found. if there are no hits left then and everthing is either in 'sink' state or 'miss' state or 'unguessed' state then it goes back to the random shooting.
@@ -48,6 +48,17 @@
 	
 	this approach was a significant improvement over the previous one as it resulted in an average of about $44$ moves tested for $10000$ games. This was the result with a random placement of opponent's ships on each game, subject to the constraints of the game and an intelligent placement might result in a worse average.
 	
+	\subsubsection{use of statistics of opponent's ship placement}
+	
+	A 2D matrix (oppstatscore) was created which gave scores to corresponding points where a ship was found on the opponent's boards. Also, scores were deducted if a miss occured at any point. points where no shots were fired in the duration of the game were given a "benefit of doubt" and partial scores were given to them. the scores were given as follows: 
+	\begin{itemize}
+		\item +2 on a hit.
+		\item -1 on a miss.
+		\item +1 on unknown status of that point.
+	\end{itemize}		
+This was done to counter strategies which directly work against my own offensive strategy. The coefficient of variance of this matrix was used to see if a change in strategy was required or not. if so, the points with highest scores were hit-at first.
+	
+	
 	\subsubsection{intelligent ship placement}
 	
 	So far, I had only been placing the ships randomly. A better way to place the ships would be to see the points where the opponent shoots early in the game and not place any of the ships at those points. This was done by using a 10x10 matrix with each point on the grid having an initial score of $0$ and as the opponent shoots at the player board the corresponding point on this matrix get an incrementation in score. i.e.\ $100$ for the \nth{1} point, $99$ for the \nth{2}, etc. based on this score, the ships will now be placed on the best possible blocks with lowest score. On competeting with the same algorithm with random placement of ships, It won about $9$ out of every $10$ games.
@@ -56,11 +67,4 @@
 	
 	I have also made a file \textit{gamemaster.py} which imports the code of the original file, \textit{battleship.py} and uses it to actually play the game. what this file does is that it will ask a player the coordinates of the point where they want to play their next move. how they choose those particular coordinates is subject to the internal workings of their algorithm. then gamemaster "shoots" at the said coordinates of the opponent's board. the opponent now gives a feedback based on whether the player has missed or hit or sunk a ship. based on this feedback the player will now update their radar. the same process is then repeated with the roles reversed and this continues until someone wins. This file is also where the pygame module is used, to show the games played graphically.
 	
-	
-   
-   \section{future plans}
-  
-  I will keep trying to refine the algorithm and make it more efficient.
-  
-  one particular thing that I plan to do now is to make the attacking algorithm dynamic enough to be able to beat ship placements designed to play against the current algorithm e.g.\ \textit{always placing ships on the corners.} this might be done in a similar fashion as the intelligent ship placement. 
 \end{document}

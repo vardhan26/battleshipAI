@@ -88,37 +88,39 @@ def main():
 		if len(p1.ships)==0:
 			#print "victory in %d moves" %(c)
 			#pprint(p1.statscore)
+			p1.resetplayer(p1)
+			p2.resetplayer(p2)
 			score+=1
 			counter+=1
-			p1.board = []
-			p1.radar = []
-			p1.probscore = []
-			p1.neighbourscore = []
-			p1.bestprob = []
-			p1.hitfound = []
-			p1.shipnames = {'aircraft carrier':[],
-						'battleship':[],
-						'destroyer':[],
-						'cruiser':[],
-						'patrol boat':[]}
-			p1.ships = [5,4,3,3,2]
-			p1.oppships = [5,4,3,3,2]
-			p1.scoreadd = 100
-			p1.maxprob=0
-			p2.board = []
-			p2.radar = []
-			p2.probscore = []
-			p2.neighbourscore = []
-			p2.bestprob = []
-			p2.hitfound = []
-			p2.shipnames = {'aircraft carrier':[],
-						'battleship':[],
-						'destroyer':[],
-						'cruiser':[],
-						'patrol boat':[]}
-			p2.ships = [5,4,3,3,2]
-			p2.oppships = [5,4,3,3,2]
-			p2.maxprob=0
+			# p1.board = []
+			# p1.radar = []
+			# p1.probscore = []
+			# p1.neighbourscore = []
+			# p1.bestprob = []
+			# p1.hitfound = []
+			# p1.shipnames = {'aircraft carrier':[],
+			# 			'battleship':[],
+			# 			'destroyer':[],
+			# 			'cruiser':[],
+			# 			'patrol boat':[]}
+			# p1.ships = [5,4,3,3,2]
+			# p1.oppships = [5,4,3,3,2]
+			# p1.scoreadd = 100
+			# p1.maxprob=0
+			# p2.board = []
+			# p2.radar = []
+			# p2.probscore = []
+			# p2.neighbourscore = []
+			# p2.bestprob = []
+			# p2.hitfound = []
+			# p2.shipnames = {'aircraft carrier':[],
+			# 			'battleship':[],
+			# 			'destroyer':[],
+			# 			'cruiser':[],
+			# 			'patrol boat':[]}
+			# p2.ships = [5,4,3,3,2]
+			# p2.oppships = [5,4,3,3,2]
+			# p2.maxprob=0
 			if abc>=matches:
 				print "player 1 won %d out of %d matches" %(counter,matches)
 				pygame.quit()
@@ -137,36 +139,38 @@ def main():
 		if len(p2.ships)==0:
 			#print "victory in %d moves" %(c)
 			#pprint(p1.statscore)
+			p1.resetplayer(p1)
+			p2.resetplayer(p2)
 			counter+=1
-			p1.board = []
-			p1.radar = []
-			p1.probscore = []
-			p1.neighbourscore = []
-			p1.bestprob = []
-			p1.hitfound = []
-			p1.shipnames = {'aircraft carrier':[],
-						'battleship':[],
-						'destroyer':[],
-						'cruiser':[],
-						'patrol boat':[]}
-			p1.ships = [5,4,3,3,2]
-			p1.oppships = [5,4,3,3,2]
-			p1.maxprob=0
-			p1.scoreadd = 100
-			p2.board = []
-			p2.radar = []
-			p2.probscore = []
-			p2.neighbourscore = []
-			p2.bestprob = []
-			p2.hitfound = []
-			p2.shipnames = {'aircraft carrier':[],
-						'battleship':[],
-						'destroyer':[],
-						'cruiser':[],
-						'patrol boat':[]}
-			p2.ships = [5,4,3,3,2]
-			p2.oppships = [5,4,3,3,2]
-			p2.maxprob=0
+			# p1.board = []
+			# p1.radar = []
+			# p1.probscore = []
+			# p1.neighbourscore = []
+			# p1.bestprob = []
+			# p1.hitfound = []
+			# p1.shipnames = {'aircraft carrier':[],
+			# 			'battleship':[],
+			# 			'destroyer':[],
+			# 			'cruiser':[],
+			# 			'patrol boat':[]}
+			# p1.ships = [5,4,3,3,2]
+			# p1.oppships = [5,4,3,3,2]
+			# p1.maxprob=0
+			# p1.scoreadd = 100
+			# p2.board = []
+			# p2.radar = []
+			# p2.probscore = []
+			# p2.neighbourscore = []
+			# p2.bestprob = []
+			# p2.hitfound = []
+			# p2.shipnames = {'aircraft carrier':[],
+			# 			'battleship':[],
+			# 			'destroyer':[],
+			# 			'cruiser':[],
+			# 			'patrol boat':[]}
+			# p2.ships = [5,4,3,3,2]
+			# p2.oppships = [5,4,3,3,2]
+			# p2.maxprob=0
 			if abc>=matches:
 				print "player 1 won %d out of %d matches" %(counter,matches)
 				pygame.quit()
